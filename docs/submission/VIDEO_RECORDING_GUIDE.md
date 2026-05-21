@@ -13,16 +13,30 @@ The 60-second hero is the **real ElevenLabs audio** we already generated.
   account — fine to use. Avoid real customer/company names (our data is synthetic).
 
 ## 1. Prep the live demo (once)
+Run from the repo root. Use `python3` (zsh + pyenv often don't alias `python`).
+Paste one line at a time — don't include the trailing comments.
+
 ```bash
-# from repo root
-python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 python business_context/seed_data/generate_customers.py
 set -a && source .env && set +a
-python orchestration/export_briefings_live.py --all --audio   # real prose + 5 mp3s
-cd web && npm install && npm run dev                          # http://localhost:3000
+python orchestration/export_briefings_live.py --all --audio
 ```
-Confirm the dashboard shows live data (header quote like "We lost $11,748…") and the
-audio files exist in `web/public/audio/`.
+
+Then start the dashboard (separate command — no inline comment):
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Open http://localhost:3000. The live briefings + 5 audio MP3s are already committed-as-
+artifacts on disk, so if the export step fails you can still record — just run the
+dashboard. Confirm the header quote reads like "We lost $11,748…" and
+`web/public/audio/` has the mp3s.
 
 ## 2. What to screen-record (capture raw clips, edit later)
 Use macOS screen recording (**Cmd+Shift+5**, record selected area at the display's native
