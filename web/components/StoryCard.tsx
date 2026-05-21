@@ -40,7 +40,13 @@ export default function StoryCard({ story, index }: { story: Story; index: numbe
 
       <p className="text-dim leading-relaxed mb-4">{story.summary}</p>
 
-      {story.citations.length > 0 && (
+      {story.qualitative_only && (
+        <div className="text-xs font-mono text-gold border border-gold/40 bg-gold/10 rounded-lg px-3 py-2 mb-4">
+          ⚠ Confidence below threshold — qualitative only; dollar figures withheld.
+        </div>
+      )}
+
+      {!story.qualitative_only && story.citations.length > 0 && (
         <div className="border-t border-border pt-4 mt-4">
           <div className="text-xs text-muted uppercase tracking-wider mb-3 font-mono">
             Receipts
@@ -57,7 +63,7 @@ export default function StoryCard({ story, index }: { story: Story; index: numbe
 
       <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
         <div className="flex items-center gap-4 text-sm text-dim">
-          {story.exposure_usd > 0 && (
+          {!story.qualitative_only && story.exposure_usd > 0 && (
             <span>
               Exposure: <span className="text-white font-semibold">
                 ${story.exposure_usd.toLocaleString()}

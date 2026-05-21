@@ -19,6 +19,7 @@ export interface Story {
   duration_min?: number;
   citations: Citation[];
   drill_down_url: string;
+  qualitative_only?: boolean;
 }
 
 export interface Decision {

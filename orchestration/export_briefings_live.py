@@ -72,6 +72,7 @@ async def run_pipeline(persona: Persona):
 
 def _story(cluster, qs_index, script_citations) -> dict:
     qs = qs_index.get(cluster.primary_signal_id)
+    qualitative = bool(qs and qs.qualitative_only)
     cits = [
         {"claim_text": c.claim_text, "methodology": c.methodology,
          "confidence": c.confidence, "splunk_query": c.splunk_query}
@@ -90,8 +91,9 @@ def _story(cluster, qs_index, script_citations) -> dict:
         "priority_score": round(cluster.aggregate_priority, 1),
         "affected_customers": qs.customer_impact.affected_count if qs else None,
         "duration_min": round(qs.enriched.raw_signal.duration_minutes) if qs else None,
-        "citations": cits,
+        "citations": [] if qualitative else cits,
         "drill_down_url": "#",
+        "qualitative_only": qualitative,
     }
 
 

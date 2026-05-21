@@ -1,0 +1,56 @@
+[
+  {
+    "keywords": [
+      "payment",
+      "error"
+    ],
+    "spl": "search index=prod sourcetype=payment-svc status>=500 | timechart span=1m count",
+    "explanation": "Payment-service 5xx errors per minute."
+  },
+  {
+    "keywords": [
+      "login",
+      "fail"
+    ],
+    "spl": "search index=security sourcetype=auth-svc result=blocked | stats count by src_ip, asn",
+    "explanation": "Blocked login attempts grouped by source IP and ASN."
+  },
+  {
+    "keywords": [
+      "credential",
+      "stuffing"
+    ],
+    "spl": "search index=security sourcetype=auth-svc result IN (blocked, challenged) | bin _time span=15m | stats count AS attempts, dc(src_ip) AS unique_ips by _time",
+    "explanation": "Credential-stuffing volume and unique source IPs over 15-minute windows."
+  },
+  {
+    "keywords": [
+      "latency",
+      "checkout"
+    ],
+    "spl": "search index=prod sourcetype=checkout-svc | timechart span=1h p99(response_ms)",
+    "explanation": "Checkout p99 latency by hour."
+  },
+  {
+    "keywords": [
+      "latency"
+    ],
+    "spl": "search index=prod | timechart span=1h p99(response_ms) by sourcetype",
+    "explanation": "p99 latency by service, hourly."
+  },
+  {
+    "keywords": [
+      "cost"
+    ],
+    "spl": "search index=finance sourcetype=aws-billing | timechart span=1d sum(cost_usd) by service",
+    "explanation": "Daily infrastructure spend by service."
+  },
+  {
+    "keywords": [
+      "sla",
+      "breach"
+    ],
+    "spl": "search index=prod status>=500 | stats count by service | where count > 0",
+    "explanation": "Services with errors that may breach SLA."
+  }
+]

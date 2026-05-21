@@ -7,6 +7,7 @@ import AudioPlayer from "@/components/AudioPlayer";
 import StoryCard from "@/components/StoryCard";
 import DecisionCard from "@/components/DecisionCard";
 import PersonaSwitch from "@/components/PersonaSwitch";
+import DrillDown from "@/components/DrillDown";
 
 export default function Home() {
   const [persona, setPersona] = useState<Persona>("CEO");
@@ -59,6 +60,8 @@ export default function Home() {
           ))}
         </section>
       )}
+
+      <DrillDown />
 
       {briefing.good_news && (
         <section>
