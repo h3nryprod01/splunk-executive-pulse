@@ -68,8 +68,13 @@ Executive dashboard (Next.js 14, mock-data backed — persona switcher, audio
 player, story cards with citation tooltips, decision cards):
 
 ```bash
-# (optional) compute live briefings from the real pipeline for all personas
-python orchestration/export_briefings.py        # -> web/public/briefings/*.json
+# (optional) keyless briefings (deterministic, no LLM/TTS)
+python orchestration/export_briefings.py         # -> web/public/briefings/*.json
+
+# (optional) LIVE briefings: real narration (Splunk Hosted Models / LLM) + audio
+#   needs .env with SPLUNK_LLM_* or ANTHROPIC_API_KEY (+ ELEVENLABS_API_KEY for --audio)
+set -a && source .env && set +a
+python orchestration/export_briefings_live.py --all --audio
 
 cd web && npm install && npm run dev             # http://localhost:3000
 ```

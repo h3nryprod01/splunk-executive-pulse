@@ -12,6 +12,20 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 
+def _extract_json(text: str) -> dict:
+    """Parse a JSON object from an LLM response, tolerating code fences and
+    surrounding prose by slicing the outermost { ... } span."""
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[-1]
+        if text.rstrip().endswith("```"):
+            text = text.rstrip()[:-3]
+    start, end = text.find("{"), text.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        text = text[start:end + 1]
+    return json.loads(text)
+
+
 class LLMClient:
     def __init__(
         self,
@@ -65,29 +79,37 @@ class LLMClient:
             return json.loads(content)
 
     async def _call_anthropic(self, system, user, max_tokens, temperature):
-        async with httpx.AsyncClient(timeout=60) as c:
-            r = await c.post(
-                "https://api.anthropic.com/v1/messages",
-                headers={
-                    "x-api-key": os.getenv("ANTHROPIC_API_KEY"),
-                    "anthropic-version": "2023-06-01",
-                    "content-type": "application/json",
-                },
-                json={
-                    "model": "claude-sonnet-4-6",
-                    "max_tokens": max_tokens,
-                    "temperature": temperature,
-                    "system": system,
-                    "messages": [{"role": "user", "content": user}],
-                },
-            )
-            r.raise_for_status()
-            text = r.json()["content"][0]["text"]
-            # Strip ```json fences if present
-            text = text.strip()
-            if text.startswith("```"):
-                text = "\n".join(text.split("\n")[1:-1])
-            return json.loads(text)
+        last_err: Exception | None = None
+        attempt_user = user
+        for attempt in range(3):
+            async with httpx.AsyncClient(timeout=60) as c:
+                r = await c.post(
+                    "https://api.anthropic.com/v1/messages",
+                    headers={
+                        "x-api-key": os.getenv("ANTHROPIC_API_KEY"),
+                        "anthropic-version": "2023-06-01",
+                        "content-type": "application/json",
+                    },
+                    json={
+                        "model": "claude-sonnet-4-6",
+                        "max_tokens": max_tokens,
+                        "temperature": temperature,
+                        "system": system,
+                        "messages": [{"role": "user", "content": attempt_user}],
+                    },
+                )
+                r.raise_for_status()
+                text = r.json()["content"][0]["text"]
+            try:
+                return _extract_json(text)
+            except json.JSONDecodeError as e:
+                last_err = e
+                logger.warning(f"Anthropic returned invalid JSON (attempt {attempt + 1}); retrying")
+                attempt_user = user + (
+                    "\n\nIMPORTANT: Respond with ONLY a single valid JSON object. "
+                    "No markdown, no prose, and escape every double-quote inside string values."
+                )
+        raise last_err
 
     async def _call_openai(self, system, user, max_tokens, temperature):
         async with httpx.AsyncClient(timeout=60) as c:

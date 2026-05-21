@@ -31,3 +31,6 @@ splunk hackathon2.txt
 # Generated briefings (run orchestration/export_briefings.py)
 web/public/briefings/*.json
 !web/public/briefings/.gitkeep
+
+# Generated audio (run export_briefings_live.py --audio)
+web/public/audio/
