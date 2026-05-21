@@ -34,3 +34,6 @@ web/public/briefings/*.json
 
 # Generated audio (run export_briefings_live.py --audio)
 web/public/audio/
+
+# Local agent/editor config
+.claude/
