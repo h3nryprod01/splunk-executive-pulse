@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Executive Pulse — title cards</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@500;700&display=swap");
+  :root{
+    --bg:#0a0e1a; --ink:#f1f5f9; --dim:#94a3b8;
+    --splunk:#65a637; --gold:#f5b800;
+  }
+  *{margin:0;box-sizing:border-box}
+  html,body{height:100%;background:#000;overflow:hidden}
+  /* 1920x1080 stage, scaled to fit the window */
+  #stage{
+    position:absolute;top:50%;left:50%;
+    width:1920px;height:1080px;transform:translate(-50%,-50%) scale(var(--s,1));
+    background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;
+    overflow:hidden;
+  }
+  .card{position:absolute;inset:0;display:none;flex-direction:column;
+    justify-content:center;padding:160px 150px;gap:34px}
+  .card.on{display:flex;animation:rise .6s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+  .kicker{font-family:"JetBrains Mono",monospace;font-weight:700;letter-spacing:.32em;
+    text-transform:uppercase;color:var(--splunk);font-size:26px;display:flex;align-items:center;gap:18px}
+  .dot{width:16px;height:16px;border-radius:50%;background:var(--splunk);
+    box-shadow:0 0 0 0 rgba(101,166,55,.6);animation:pulse 2s infinite}
+  @keyframes pulse{70%{box-shadow:0 0 0 22px rgba(101,166,55,0)}100%{box-shadow:0 0 0 0 rgba(101,166,55,0)}}
+  h1{font-size:104px;line-height:1.04;font-weight:900;letter-spacing:-.02em;max-width:1500px}
+  h1 .g{color:var(--gold)} h1 .s{color:var(--splunk)}
+  p.sub{font-size:40px;line-height:1.4;color:var(--dim);max-width:1320px;font-weight:300}
+  .stat{font-size:150px;font-weight:900;letter-spacing:-.03em}
+  .caps{display:flex;flex-wrap:wrap;gap:18px;margin-top:6px}
+  .chip{font-family:"JetBrains Mono",monospace;font-weight:500;font-size:30px;
+    border:1px solid #1e2a44;background:#0f1830;color:#cbd5e1;border-radius:14px;padding:16px 26px}
+  .chip b{color:var(--splunk);font-weight:700}
+  .url{font-family:"JetBrains Mono",monospace;font-size:32px;color:var(--splunk)}
+  .foot{position:absolute;bottom:60px;left:150px;right:150px;display:flex;justify-content:space-between;
+    font-family:"JetBrains Mono",monospace;font-size:24px;color:#475569}
+  .hint{position:fixed;bottom:14px;left:14px;color:#475569;font:13px/1 "JetBrains Mono",monospace;z-index:9}
+  .lower3{position:absolute;left:150px;bottom:150px;right:150px}
+  .lower3 .bar{display:inline-block;background:rgba(10,14,26,.86);backdrop-filter:blur(6px);
+    border-left:6px solid var(--gold);padding:26px 38px;border-radius:6px}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- 1 — TITLE -->
+  <section class="card on">
+    <div class="kicker"><span class="dot"></span>Splunk Agentic Ops Hackathon 2026</div>
+    <h1>Splunk <span class="g">Executive Pulse</span></h1>
+    <p class="sub">From operational data to executive decisions, in three minutes.</p>
+  </section>
+
+  <!-- 2 — PROBLEM -->
+  <section class="card">
+    <div class="kicker"><span class="dot"></span>The problem</div>
+    <h1>Your CEO can't read Splunk. <span class="g">That's a $4B problem.</span></h1>
+    <p class="sub">Enterprises spend billions on observability — yet the people making
+      million-dollar decisions can't consume the output.</p>
+  </section>
+
+  <!-- 3 — INSIGHT / PERSONALIZATION -->
+  <section class="card">
+    <div class="kicker"><span class="dot"></span>Personalization</div>
+    <h1>Same data.<br/><span class="s">Different lens.</span></h1>
+    <p class="sub">The CEO leads with revenue. The CISO leads with the security threat.
+      One pipeline, a briefing for every executive.</p>
+  </section>
+
+  <!-- 4 — HOW IT WORKS / CAPABILITIES -->
+  <section class="card">
+    <div class="kicker"><span class="dot"></span>How it works</div>
+    <h1>7 agents. 1 briefing. <span class="g">Zero hallucinations.</span></h1>
+    <div class="caps">
+      <div class="chip"><b>Splunk</b> MCP Server</div>
+      <div class="chip"><b>Splunk</b> Hosted Models</div>
+      <div class="chip"><b>AI Assistant</b> for SPL</div>
+      <div class="chip"><b>AI Toolkit</b> (MLTK)</div>
+    </div>
+    <p class="sub">Every dollar traces to a Splunk query and a transparent formula.</p>
+  </section>
+
+  <!-- 5 — PROOF STAT -->
+  <section class="card">
+    <div class="kicker"><span class="dot"></span>The payoff</div>
+    <div class="stat">3 min<span style="color:var(--dim);font-size:64px;font-weight:300"> vs. a 2-hour briefing prep</span></div>
+    <p class="sub">From engineers to the C-suite — a new persona for Splunk, and the
+      briefing your executives can't live without.</p>
+  </section>
+
+  <!-- 6 — CLOSE -->
+  <section class="card">
+    <div class="kicker"><span class="dot"></span>Splunk Executive Pulse</div>
+    <h1>Splunk already powers the world's data.<br/><span class="g">Now it powers the decisions.</span></h1>
+    <div class="url">github.com/h3nryprod01/splunk-executive-pulse</div>
+  </section>
+
+  <!-- LOWER-THIRD (overlay over a screen recording) — card 7 -->
+  <section class="card" style="background:transparent">
+    <div class="lower3"><div class="bar">
+      <div class="kicker" style="margin-bottom:10px"><span class="dot"></span>Splunk Executive Pulse</div>
+      <div style="font-size:40px;font-weight:800">Same data. Different lens.</div>
+    </div></div>
+  </section>
+
+  <div class="foot"><span>Splunk Executive Pulse</span><span>From data to decisions, in 3 minutes</span></div>
+</div>
+
+<div class="hint">← / →  navigate · F fullscreen · card <span id="n">1</span>/7</div>
+<script>
+  const cards=[...document.querySelectorAll('.card')]; let i=0;
+  const stage=document.getElementById('stage');
+  function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.setProperty('--s',s)}
+  function show(k){cards[i].classList.remove('on');i=(k+cards.length)%cards.length;
+    cards[i].classList.add('on');document.getElementById('n').textContent=i+1}
+  addEventListener('resize',fit); fit();
+  addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' ')show(i+1);
+    else if(e.key==='ArrowLeft')show(i-1);
+    else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+    else if(/^[1-7]$/.test(e.key))show(+e.key-1);
+  });
+</script>
+</body>
+</html>

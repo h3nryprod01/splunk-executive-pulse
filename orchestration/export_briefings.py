@@ -59,6 +59,7 @@ def _story(cluster, qs_index) -> dict:
     qs = qs_index.get(cluster.primary_signal_id)
     affected = qs.customer_impact.affected_count if qs else None
     duration = round(qs.enriched.raw_signal.duration_minutes) if qs else None
+    qualitative = bool(qs and qs.qualitative_only)
     return {
         "cluster_id": cluster.cluster_id,
         "theme": cluster.theme.value,
@@ -68,8 +69,10 @@ def _story(cluster, qs_index) -> dict:
         "priority_score": round(cluster.aggregate_priority, 1),
         "affected_customers": affected,
         "duration_min": duration,
-        "citations": _citations_for(qs) if qs else [],
+        # When confidence is too low we withhold the dollar figures (no citations).
+        "citations": [] if qualitative else (_citations_for(qs) if qs else []),
         "drill_down_url": "#",
+        "qualitative_only": qualitative,
     }
 
 

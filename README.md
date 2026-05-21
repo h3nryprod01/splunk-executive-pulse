@@ -62,7 +62,14 @@ python orchestration/graph_e2e_demo.py --persona CISO
 
 # executive drill-down: plain-English question -> SPL (Splunk AI Assistant)
 python orchestration/drilldown_demo.py
+
+# anti-hallucination gate: low confidence -> dollar figure withheld (not fabricated)
+python orchestration/qualitative_demo.py
 ```
+
+The dashboard also has a live **"Ask about last night"** panel (the drill-down loop)
+backed by `/api/drilldown`, and story cards render a **"qualitative only"** notice
+(withholding dollar figures) when a signal's confidence is below threshold.
 
 Executive dashboard (Next.js 14, mock-data backed — persona switcher, audio
 player, story cards with citation tooltips, decision cards):
