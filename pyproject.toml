@@ -1,0 +1,7 @@
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["."]
+testpaths = ["agents", "tests"]
+# Integration tests need a live stack (make demo) + langgraph/hypothesis;
+# run them explicitly with `pytest tests/integration`.
+addopts = "--ignore=tests/integration"

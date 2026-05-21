@@ -1,0 +1,9 @@
+service_id,service_name,tier,owner_team,business_function,revenue_critical,revenue_per_min_usd,customer_facing,regulated_data,splunk_index,splunk_sourcetype
+svc-001,payment-api,tier-0,payments-team,payments,true,3916,true,PCI,prod,payment-svc
+svc-002,checkout-api,tier-0,ecommerce-team,checkout,true,2200,true,"PCI,PII",prod,checkout-svc
+svc-003,auth-api,tier-1,platform-team,authentication,false,0,true,PII,prod,auth-svc
+svc-004,catalog-api,tier-1,catalog-team,browse,false,180,true,,prod,catalog-svc
+svc-005,analytics-pipeline,tier-2,data-team,internal,false,0,false,,prod,spark
+svc-006,recommendation-svc,tier-2,ml-team,personalization,false,420,true,,prod,rec-svc
+svc-007,notification-svc,tier-2,growth-team,messaging,false,0,true,PII,prod,notif
+svc-008,admin-portal,tier-3,internal-tools,internal,false,0,false,,prod,admin

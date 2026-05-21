@@ -1,0 +1,14 @@
+index=prod sourcetype IN (payment-svc, checkout-svc, catalog-svc, auth-svc, rec-svc)
+| bin _time span=1h
+| stats
+    perc95(latency_ms) AS p95_value,
+    perc99(latency_ms) AS p99_value,
+    count AS request_count
+    BY _time, sourcetype
+| eval service = replace(sourcetype, "-svc$", "-api")
+| eventstats avg(p99_value) AS baseline_p99, stdev(p99_value) AS sd_p99 BY service
+| eval sigma = if(sd_p99=0, 0, (p99_value - baseline_p99) / sd_p99)
+| where sigma >= ##LATENCY_SIGMA## AND request_count >= 100
+| eval latency_metric = "p99_ms", latency_value = p99_value, baseline_value = baseline_p99, window_min = 60
+| sort _time
+| fields _time, service, latency_metric, latency_value, baseline_value, sigma, request_count, window_min

@@ -1,0 +1,3 @@
+index=cicd sourcetype=github-actions event=deploy
+| sort _time
+| fields _time, service, version, actor, gate_passed, rollback_at

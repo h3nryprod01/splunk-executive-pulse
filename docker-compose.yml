@@ -1,0 +1,116 @@
+# docker-compose.yml
+services:
+  # ============ SPLUNK DEV ============
+  splunk:
+    image: splunk/splunk:latest
+    container_name: pulse-splunk
+    hostname: splunk
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: ${SPLUNK_PASSWORD:-changeme123!}
+      SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN:-pulse-hec-token-dev}
+    ports:
+      - "8000:8000"   # Splunk Web
+      - "8089:8089"   # Splunk REST
+      - "8088:8088"   # HEC
+    volumes:
+      - splunk_data:/opt/splunk/var
+      - ./splunk_config/default.yml:/tmp/defaults/default.yml:ro
+    healthcheck:
+      test: ["CMD", "curl", "-fsk", "https://localhost:8089/services/server/info", "-u", "admin:${SPLUNK_PASSWORD:-changeme123!}"]
+      interval: 15s
+      retries: 20
+      start_period: 60s
+
+  # ============ POSTGRES (Business Context) ============
+  postgres:
+    image: postgres:16-alpine
+    container_name: pulse-postgres
+    environment:
+      POSTGRES_DB: pulse
+      POSTGRES_USER: pulse
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-pulse_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./business_context/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./business_context/seed_data:/seed_data:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pulse"]
+      interval: 5s
+      retries: 10
+
+  # ============ REDIS (Pipeline State / Checkpoints) ============
+  redis:
+    image: redis:7-alpine
+    container_name: pulse-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 5
+
+  # ============ MCP SERVER ============
+  mcp:
+    build:
+      context: ./mcp_server
+      dockerfile: Dockerfile
+    container_name: pulse-mcp
+    environment:
+      SPLUNK_HOST: splunk
+      SPLUNK_PORT: 8089
+      SPLUNK_USER: admin
+      SPLUNK_PASSWORD: ${SPLUNK_PASSWORD:-changeme123!}
+      PG_DSN: postgresql://pulse:${PG_PASSWORD:-pulse_dev}@postgres:5432/pulse
+      MCP_API_TOKEN: ${SPLUNK_MCP_TOKEN:-dev-mcp-token}
+    ports:
+      - "9000:9000"
+    depends_on:
+      splunk:    { condition: service_healthy }
+      postgres:  { condition: service_healthy }
+
+  # ============ PIPELINE WORKER ============
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile.pipeline
+    container_name: pulse-pipeline
+    environment:
+      SPLUNK_MCP_URL: http://mcp:9000
+      SPLUNK_MCP_TOKEN: ${SPLUNK_MCP_TOKEN:-dev-mcp-token}
+      PG_DSN: postgresql://pulse:${PG_PASSWORD:-pulse_dev}@postgres:5432/pulse
+      REDIS_URL: redis://redis:6379
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+      DASHBOARD_BASE_URL: http://localhost:3000
+    volumes:
+      - ./demo/sample_outputs:/app/demo/sample_outputs
+    depends_on:
+      mcp:       { condition: service_started }
+      redis:     { condition: service_healthy }
+      postgres:  { condition: service_healthy }
+
+  # ============ WEB DASHBOARD ============
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: pulse-web
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_BASE: http://localhost:8080
+    depends_on:
+      - pipeline
+
+volumes:
+  splunk_data:
+  pg_data:
+  redis_data:

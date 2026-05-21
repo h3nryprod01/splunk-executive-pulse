@@ -1,0 +1,12 @@
+index=prod sourcetype=*-svc status>=500
+| bin _time span=1m
+| stats count AS error_count BY _time, sourcetype
+| eval service = replace(sourcetype, "-svc$", "-api")
+| eventstats
+    avg(error_count) AS baseline_avg,
+    stdev(error_count) AS baseline_stdev
+    BY service
+| eval sigma_deviation = if(baseline_stdev=0, 0, (error_count - baseline_avg) / baseline_stdev)
+| where error_count >= ##MIN_COUNT## AND sigma_deviation >= ##ERROR_SIGMA##
+| sort _time
+| fields _time, service, error_count, baseline_avg, sigma_deviation

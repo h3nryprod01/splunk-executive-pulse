@@ -1,0 +1,5 @@
+exec_id,name,role,delivery_email,delivery_slack,delivery_time_local,timezone,voice_preset,language,briefing_length_max_sec,focus_areas
+exec-001,Sarah Chen,CEO,sarah@demo.co,@sarah,07:55,America/New_York,bloomberg_female,en,180,"revenue,reputation,strategic"
+exec-002,Marcus Lee,CFO,marcus@demo.co,@marcus,07:30,America/New_York,bloomberg_male,en,180,"financial,cost,roi"
+exec-003,Priya Nair,CISO,priya@demo.co,@priya,07:00,America/New_York,bloomberg_female,en,180,"security,compliance,threat"
+exec-004,Tom Bradley,CTO,tom@demo.co,@tom,07:30,America/New_York,bloomberg_male,en,180,"technical,capacity,velocity"

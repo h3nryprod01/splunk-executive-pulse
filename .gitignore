@@ -1,0 +1,29 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Secrets
+.env
+.env.local
+
+# Generated demo data
+business_context/seed_data/customers.csv
+
+# Node / Next.js (web/)
+node_modules/
+web/node_modules/
+web/.next/
+.next/
+
+# Audio artifacts
+*.mp3
+*.wav
+
+# Transcripts / scratch (source brainstorms, not part of the deliverable)
+splunk hackathon.txt
+splunk hackathon2.txt
+
+# macOS
+.DS_Store

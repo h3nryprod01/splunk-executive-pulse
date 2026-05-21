@@ -1,0 +1,14 @@
+index=security sourcetype=auth-svc result IN (blocked, challenged)
+| bin _time span=15m
+| stats
+    count AS attempts,
+    dc(src_ip) AS unique_ips,
+    values(asn) AS asns
+    BY _time
+| eventstats avg(attempts) AS baseline_attempts, stdev(attempts) AS sd_attempts
+| eval sigma = if(sd_attempts=0, 0, (attempts - baseline_attempts) / sd_attempts)
+| where attempts >= 1000 AND sigma >= 3
+| eval window_start = _time, window_end = _time + 900
+| eval total_attempts = attempts
+| eval top_asn = mvindex(asns, 0)
+| fields window_start, window_end, total_attempts, unique_ips, top_asn, baseline_attempts, sigma

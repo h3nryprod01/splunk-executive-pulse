@@ -1,0 +1,14 @@
+contract_id,customer_id,service_id,uptime_target_pct,latency_target_ms,credit_pct_per_breach,monthly_fee_usd,measurement_window,active
+sla-001,cust-001,svc-001,99.99,500,10,40000,monthly,true
+sla-002,cust-002,svc-001,99.99,300,15,60000,monthly,true
+sla-003,cust-003,svc-001,99.99,500,10,31000,monthly,true
+sla-004,cust-004,svc-001,99.99,500,10,28000,monthly,true
+sla-005,cust-005,svc-001,99.99,400,12,45000,monthly,true
+sla-006,cust-006,svc-001,99.99,500,10,22000,monthly,true
+sla-007,cust-007,svc-001,99.99,500,8,18000,monthly,true
+sla-008,cust-008,svc-001,99.99,600,10,35000,monthly,true
+sla-009,cust-009,svc-001,99.99,500,10,27000,monthly,true
+sla-010,cust-010,svc-001,99.99,450,12,52000,monthly,true
+sla-011,cust-011,svc-001,99.99,500,10,30000,monthly,true
+sla-012,cust-012,svc-001,99.99,500,10,24000,monthly,true
+sla-013,cust-001,svc-002,99.9,800,5,30000,monthly,true
