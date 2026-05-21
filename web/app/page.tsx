@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BRIEFINGS } from "@/lib/mock-data";
-import type { Persona } from "@/lib/types";
+import type { Briefing, Persona } from "@/lib/types";
 import BriefingHeader from "@/components/BriefingHeader";
 import AudioPlayer from "@/components/AudioPlayer";
 import StoryCard from "@/components/StoryCard";
@@ -10,7 +10,19 @@ import PersonaSwitch from "@/components/PersonaSwitch";
 
 export default function Home() {
   const [persona, setPersona] = useState<Persona>("CEO");
-  const briefing = BRIEFINGS[persona];
+  const [briefing, setBriefing] = useState<Briefing>(BRIEFINGS["CEO"]);
+
+  // Prefer live briefings computed by the Python pipeline; fall back to mock.
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/briefing?persona=${persona}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d: Briefing) => active && setBriefing(d))
+      .catch(() => active && setBriefing(BRIEFINGS[persona]));
+    return () => {
+      active = false;
+    };
+  }, [persona]);
 
   return (
     <main className="max-w-5xl mx-auto p-6 md:p-12 space-y-6">

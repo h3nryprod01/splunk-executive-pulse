@@ -68,8 +68,20 @@ Executive dashboard (Next.js 14, mock-data backed — persona switcher, audio
 player, story cards with citation tooltips, decision cards):
 
 ```bash
-cd web && npm install && npm run dev   # http://localhost:3000
+# (optional) keyless briefings (deterministic, no LLM/TTS)
+python orchestration/export_briefings.py         # -> web/public/briefings/*.json
+
+# (optional) LIVE briefings: real narration (Splunk Hosted Models / LLM) + audio
+#   needs .env with SPLUNK_LLM_* or ANTHROPIC_API_KEY (+ ELEVENLABS_API_KEY for --audio)
+set -a && source .env && set +a
+python orchestration/export_briefings_live.py --all --audio
+
+cd web && npm install && npm run dev             # http://localhost:3000
 ```
+
+The dashboard fetches `/api/briefing?persona=X` (served from the exported JSON);
+if no briefings have been exported it falls back to built-in mock data, so the UI
+always renders.
 
 Expected demo output (Story A — payment gateway outage):
 
