@@ -1,15 +1,28 @@
 # Submission checklist — Splunk Agentic Ops Hackathon
 
-## Devpost requirements coverage
+**Timeline:** May 18 – June 15, 2026 (verified on Devpost).
+
+## Confirmed Devpost rules (official)
+A valid submission needs **all four**:
+1. **Demo video** — public on **YouTube / Vimeo / Youku** (link on the form);
+   **no** unlicensed third-party trademarks, music, or copyrighted material.
+2. **Public open-source repo** — open-source license + all source/assets + run
+   instructions + README (setup & run) + dependencies + example configs/datasets.
+3. **Architecture diagram in the repo ROOT** — must show how the app interacts with
+   Splunk, how AI models/agents are integrated, and data flow between services/APIs.
+4. **Text description** of the project's features and functionality.
+
+## Coverage
 
 | Requirement | Status | Where |
 |---|---|---|
 | Text description (project story) | ✅ | [SUBMISSION.md](SUBMISSION.md) |
-| Demo video (≤ 3 min) | ⬜ **record** | script in [DEMO_SCRIPT.md](DEMO_SCRIPT.md) |
-| Open-source repository | ⬜ **push to GitHub** | `git init` done locally — see below |
-| README | ✅ | [../../README.md](../../README.md) |
-| Architecture diagram | ✅ | [../../ARCHITECTURE.md](../../ARCHITECTURE.md) (3 Mermaid diagrams) |
+| Demo video (≤ 3 min, YouTube/Vimeo/Youku) | ⬜ **record** | [VIDEO_RECORDING_GUIDE.md](VIDEO_RECORDING_GUIDE.md) + [DEMO_SCRIPT.md](DEMO_SCRIPT.md) |
+| Open-source repository | ✅ pushed | github.com/h3nryprod01/splunk-executive-pulse |
+| README (setup + run) | ✅ | [../../README.md](../../README.md) |
+| Architecture diagram **in root** | ✅ | [../../ARCHITECTURE.md](../../ARCHITECTURE.md) — Splunk interaction + agents + data flow |
 | Open-source license | ✅ | [../../LICENSE](../../LICENSE) (MIT) |
+| No secrets committed | ✅ | `.env` gitignored; `.env.example` placeholders only |
 
 ## Required Splunk capabilities (used → eligible for prizes)
 
