@@ -27,3 +27,7 @@ splunk hackathon2.txt
 
 # macOS
 .DS_Store
+
+# Generated briefings (run orchestration/export_briefings.py)
+web/public/briefings/*.json
+!web/public/briefings/.gitkeep

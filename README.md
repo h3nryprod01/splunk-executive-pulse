@@ -68,8 +68,15 @@ Executive dashboard (Next.js 14, mock-data backed — persona switcher, audio
 player, story cards with citation tooltips, decision cards):
 
 ```bash
-cd web && npm install && npm run dev   # http://localhost:3000
+# (optional) compute live briefings from the real pipeline for all personas
+python orchestration/export_briefings.py        # -> web/public/briefings/*.json
+
+cd web && npm install && npm run dev             # http://localhost:3000
 ```
+
+The dashboard fetches `/api/briefing?persona=X` (served from the exported JSON);
+if no briefings have been exported it falls back to built-in mock data, so the UI
+always renders.
 
 Expected demo output (Story A — payment gateway outage):
 
