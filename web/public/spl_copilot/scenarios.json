@@ -1,0 +1,191 @@
+{
+  "scenarios": [
+    {
+      "intent": "show me payment errors",
+      "final_spl": "search index=prod sourcetype=payment-svc http_status>=500 | timechart span=1m count",
+      "rows": [
+        {
+          "index": "prod",
+          "sourcetype": "payment-svc",
+          "_time": "06:01",
+          "http_status": 500,
+          "response_ms": 1200,
+          "customer_id": "C-1001"
+        },
+        {
+          "index": "prod",
+          "sourcetype": "payment-svc",
+          "_time": "06:02",
+          "http_status": 503,
+          "response_ms": 1500,
+          "customer_id": "C-1002"
+        },
+        {
+          "index": "prod",
+          "sourcetype": "payment-svc",
+          "_time": "06:04",
+          "http_status": 500,
+          "response_ms": 1800,
+          "customer_id": "C-1004"
+        }
+      ],
+      "steps": [
+        {
+          "reason": "Field(s) not in schema; remapped `status` -> `http_status`",
+          "before_spl": "search index=prod sourcetype=payment-svc status>=500 | timechart span=1m count",
+          "after_spl": "search index=prod sourcetype=payment-svc http_status>=500 | timechart span=1m count"
+        }
+      ],
+      "explanation": "1. Filter events matching: index=prod sourcetype=payment-svc http_status>=500\n2. Bucket the matching events over time (timechart span=1m count).",
+      "spl_source": "offline-fallback",
+      "row_count": 3
+    },
+    {
+      "intent": "blocked logins by source ip",
+      "final_spl": "search index=* blocked logins source | head 100",
+      "rows": [
+        {
+          "index": "prod",
+          "sourcetype": "payment-svc",
+          "_time": "06:01",
+          "http_status": 500,
+          "response_ms": 1200,
+          "customer_id": "C-1001"
+        },
+        {
+          "index": "prod",
+          "sourcetype": "payment-svc",
+          "_time": "06:02",
+          "http_status": 503,
+          "response_ms": 1500,
+          "customer_id": "C-1002"
+        },
+        {
+          "index": "prod",
+          "sourcetype": "payment-svc",
+          "_time": "06:03",
+          "http_status": 200,
+          "response_ms": 120,
+          "customer_id": "C-1003"
+        },
+        {
+          "index": "prod",
+          "sourcetype": "payment-svc",
+          "_time": "06:04",
+          "http_status": 500,
+          "response_ms": 1800,
+          "customer_id": "C-1004"
+        },
+        {
+          "index": "security",
+          "sourcetype": "auth-svc",
+          "_time": "06:01",
+          "result": "blocked",
+          "src_ip": "5.5.5.5",
+          "asn": "AS999",
+          "username": "alice"
+        },
+        {
+          "index": "security",
+          "sourcetype": "auth-svc",
+          "_time": "06:02",
+          "result": "blocked",
+          "src_ip": "5.5.5.6",
+          "asn": "AS999",
+          "username": "bob"
+        },
+        {
+          "index": "security",
+          "sourcetype": "auth-svc",
+          "_time": "06:03",
+          "result": "allowed",
+          "src_ip": "10.0.0.1",
+          "asn": "AS1",
+          "username": "carol"
+        }
+      ],
+      "steps": [],
+      "explanation": "1. Filter events matching: index=* blocked logins source\n2. Return only the first 100 rows.",
+      "spl_source": "offline-fallback",
+      "row_count": 7
+    },
+    {
+      "intent": "checkout latency",
+      "final_spl": "search index=prod sourcetype=checkout-svc | timechart span=1h p99(response_ms)",
+      "rows": [],
+      "steps": [],
+      "explanation": "1. Filter events matching: index=prod sourcetype=checkout-svc\n2. Bucket the matching events over time (timechart span=1h p99(response_ms)).",
+      "spl_source": "offline-fallback",
+      "row_count": 0
+    },
+    {
+      "intent": "purple monkey dishwasher zorp",
+      "final_spl": "search index=* purple monkey dishwasher zorp | head 100",
+      "rows": [
+        {
+          "index": "prod",
+          "sourcetype": "payment-svc",
+          "_time": "06:01",
+          "http_status": 500,
+          "response_ms": 1200,
+          "customer_id": "C-1001"
+        },
+        {
+          "index": "prod",
+          "sourcetype": "payment-svc",
+          "_time": "06:02",
+          "http_status": 503,
+          "response_ms": 1500,
+          "customer_id": "C-1002"
+        },
+        {
+          "index": "prod",
+          "sourcetype": "payment-svc",
+          "_time": "06:03",
+          "http_status": 200,
+          "response_ms": 120,
+          "customer_id": "C-1003"
+        },
+        {
+          "index": "prod",
+          "sourcetype": "payment-svc",
+          "_time": "06:04",
+          "http_status": 500,
+          "response_ms": 1800,
+          "customer_id": "C-1004"
+        },
+        {
+          "index": "security",
+          "sourcetype": "auth-svc",
+          "_time": "06:01",
+          "result": "blocked",
+          "src_ip": "5.5.5.5",
+          "asn": "AS999",
+          "username": "alice"
+        },
+        {
+          "index": "security",
+          "sourcetype": "auth-svc",
+          "_time": "06:02",
+          "result": "blocked",
+          "src_ip": "5.5.5.6",
+          "asn": "AS999",
+          "username": "bob"
+        },
+        {
+          "index": "security",
+          "sourcetype": "auth-svc",
+          "_time": "06:03",
+          "result": "allowed",
+          "src_ip": "10.0.0.1",
+          "asn": "AS1",
+          "username": "carol"
+        }
+      ],
+      "steps": [],
+      "explanation": "1. Filter events matching: index=* purple monkey dishwasher zorp\n2. Return only the first 100 rows.",
+      "spl_source": "offline-fallback",
+      "row_count": 7
+    }
+  ]
+}
