@@ -22,15 +22,18 @@ and **narrates** in a Bloomberg-style brief.
 The moat is the **Business Context Layer** — a real enterprise data model that joins
 ops signals to revenue/customers/SLAs. Not a wrapper around an LLM.
 
-## Pipeline (7 agents)
+## Pipeline (6 agents)
 
 1. Signal Collector — Splunk MCP, anomaly detection → `RawSignal[]`
 2. **Business Enricher ⭐** — joins business context → `EnrichedSignal[]`
 3. **Impact Quantifier ⭐** — deterministic `$` math + citations
-4. Executive Editor — persona weighting + clustering
+4. Executive Editor — persona weighting + clustering (also extracts binary decisions / one-click actions)
 5. Narrative Writer — two-pass LLM, citation enforcement
-6. Decision Highlighter — binary decisions, one-click actions
-7. Audio Producer — ElevenLabs TTS
+6. Audio Producer — ElevenLabs TTS
+
+> Backlog: a standalone **Decision Highlighter** agent (dedicated binary-decision /
+> one-click-action surface) is planned; today the Executive Editor performs decision
+> extraction inline.
 
 ## What runs today
 
@@ -44,10 +47,10 @@ pip install -r requirements.txt
 # generate the 1,247-customer demo dataset
 python business_context/seed_data/generate_customers.py
 
-# unit tests (17 passing)
+# unit tests (30 passing)
 pytest -q
 
-# anti-hallucination proof (keyless, Hypothesis property tests)
+# anti-hallucination proof (keyless, 3 Hypothesis property tests)
 SKIP_STACK_CHECK=1 SKIP_SEED=1 pytest tests/integration/test_property_based.py -q
 # full integration suite (tests/integration/test_no_hallucination.py) needs `make up` + an LLM key
 
@@ -58,6 +61,7 @@ python orchestration/run_enricher_demo.py
 python orchestration/pipeline.py --persona CISO
 
 # the REAL LangGraph pipeline end-to-end, keyless (writer/audio/delivery stubbed)
+#   requires langgraph installed (already covered by `pip install -r requirements.txt`)
 python orchestration/graph_e2e_demo.py --persona CISO
 
 # executive drill-down: plain-English question -> SPL (Splunk AI Assistant)
@@ -107,7 +111,7 @@ slice runs without Splunk or Postgres.
 
 ## Status
 
-Extracted, compiling, and tested (15 unit tests passing):
+Extracted, compiling, and tested (30 unit tests + 3 Hypothesis property tests = 33 automated tests passing):
 
 - [x] Signal Collector — MCP wrapper + detectors + SPL queries
 - [x] Business Enricher — moat layer (CSV store for zero-infra demo)
@@ -128,6 +132,33 @@ Extracted, compiling, and tested (15 unit tests passing):
 Backlog:
 
 - [ ] Live run against real Splunk + Splunk Hosted Models + ElevenLabs (credentials)
+
+## Companion copilots
+
+Two additional, independently-runnable agents ship in this repo. Both run zero-infra /
+keyless (offline-safe) and use Splunk AI capabilities when keys are present. They share
+only the low-level Splunk clients with Executive Pulse.
+
+- **SPL Copilot** — NL→SPL with a self-critique loop. When a generated query references
+  a field the index doesn't have, the agent remaps it against the real index schema
+  (alias table + fuzzy match) and re-runs, instead of silently returning zero results.
+  Uses Splunk AI Assistant for SPL / Hosted Models when keys are present.
+
+  ```bash
+  python -m spl_copilot.demo "show me payment errors"
+  ```
+
+  See [spl_copilot/README.md](spl_copilot/README.md).
+
+- **SOC Triage Copilot** — autonomous credential-stuffing investigation. MLTK
+  anomaly detection → pivot to successful logins from the attacker IPs → data-export
+  check → deterministic **CRITICAL** verdict + analyst narrative.
+
+  ```bash
+  python -m soc_triage.demo
+  ```
+
+  See [soc_triage/README.md](soc_triage/README.md).
 
 ## Prizes targeted
 

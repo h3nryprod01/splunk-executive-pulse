@@ -110,7 +110,7 @@ agentic product layer on top of Splunk).
 | **Splunk Hosted Models** | `agents/narrative_writer/llm_client.py` — primary LLM, Anthropic/OpenAI fallback only |
 | **Splunk AI Assistant for SPL** | `agents/common/splunk_ai/spl_assistant.py` — NL→SPL for detector queries and the executive **drill-down loop** (`orchestration/drilldown_demo.py`) |
 | **Splunk AI Toolkit (MLTK)** | `agents/common/splunk_ai/mltk.py` — `anomalydetection` / `fit`+`apply` / `predict` SPL for native anomaly detection and latency forecasting (vs. hand-rolled sigma) |
-| **AI agents** | 7-agent LangGraph pipeline above |
+| **AI agents** | 6-agent LangGraph pipeline above |
 
 ### Drill-down loop (briefing → investigation)
 
@@ -122,7 +122,8 @@ phrasebook fallback when no live Assistant is configured.
 **Judging criteria mapping:**
 
 - *Technological Implementation* — typed multi-agent pipeline, deterministic
-  financial math, anti-hallucination tests (10 unit tests passing).
+  financial math, anti-hallucination tests (30 unit tests + 3 Hypothesis property
+  tests = 33 automated tests passing).
 - *Design* — audio-first 3-minute brief, per-persona personalization.
 - *Potential Impact* — expands Splunk's audience from engineers to the C-suite.
 - *Quality of Idea* — the Business Context Layer is a defensible moat, not an

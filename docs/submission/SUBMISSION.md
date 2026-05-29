@@ -37,13 +37,16 @@ audio-first business briefing for each executive:
 
 ## How we built it
 
-A 7-agent pipeline orchestrated with **LangGraph** (typed state, retry, conditional
+A 6-agent pipeline orchestrated with **LangGraph** (typed state, retry, conditional
 routing, checkpointer, structured observability):
 
 `Signal Collector → Business Enricher → Impact Quantifier → Executive Editor →
-Narrative Writer → Decision Highlighter → Audio Producer → Delivery`
+Narrative Writer → Audio Producer → Delivery`
 
-- **Backend:** Python 3.11, Pydantic-typed contracts between every agent.
+(The Executive Editor extracts binary decisions / one-click actions inline; a
+standalone Decision Highlighter agent is on the backlog.)
+
+- **Backend:** Python 3.10+, Pydantic-typed contracts between every agent.
 - **Splunk capabilities used (4):** MCP Server (search + lookups), Hosted Models
   (primary LLM), AI Assistant for SPL (NL→SPL drill-down), AI Toolkit / MLTK
   (`predict`/`anomalydetection` SPL for native forecasting).
@@ -76,7 +79,11 @@ The whole deterministic backbone runs **with zero infrastructure and zero API ke
   wrapper.
 - **Four** Splunk AI capabilities integrated.
 - Genuine **per-persona differentiation** of the briefing headline.
-- 20 automated tests (unit + property-based anti-hallucination) passing.
+- 33 automated tests (30 unit + 3 Hypothesis property-based anti-hallucination) passing.
+- Two companion copilots ship alongside the pipeline — **SPL Copilot** (NL→SPL with a
+  self-critique loop) and **SOC Triage Copilot** (autonomous credential-stuffing
+  investigation) — strengthening the **Security** track and the **Best Use of Splunk AI
+  Assistant for SPL** angle. Both run keyless/offline-safe.
 
 ## What we learned
 
@@ -104,7 +111,7 @@ Grand Prize · Best of Platform & Developer Experience · Best Use of Splunk MCP
 ```bash
 python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 python business_context/seed_data/generate_customers.py
-pytest -q                                             # 17 unit tests
+pytest -q                                             # 30 unit tests (+3 property tests = 33)
 python orchestration/graph_e2e_demo.py --persona CISO # full graph, keyless
 cd web && npm install && npm run dev                  # dashboard at :3000
 ```
