@@ -55,8 +55,7 @@ class Dependencies:
             )
         return self._splunk_mcp
 
-    @property
-    async def business_store(self) -> BusinessContextStore:
+    async def get_business_store(self) -> BusinessContextStore:
         if self._business_store is None:
             import os
             self._business_store = BusinessContextStore(dsn=os.environ["PG_DSN"])
@@ -131,7 +130,7 @@ async def node_business_enricher(state: PipelineState) -> dict:
             return {"errors": [_record_error(state, "business_enricher",
                     RuntimeError("no collector output"), 1)], "status": "failed"}
         try:
-            store = await DEPS.business_store
+            store = await DEPS.get_business_store()
             agent = BusinessEnricherAgent(store=store, mcp=DEPS.mcp_client)
             policy = RetryPolicy(max_attempts=2, base_delay_s=1.0)
             # Cross-module boundary: re-validate collector signals into the

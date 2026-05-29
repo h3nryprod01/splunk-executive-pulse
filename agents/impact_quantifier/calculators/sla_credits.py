@@ -20,6 +20,7 @@ class SLACreditsCalculator(BaseCalculator):
             return None
 
         return CalculationStep(
+            calculator_name=self.name,
             label=self.label,
             formula=f"{sla.contracts_affected} contracts × avg credit per contract",
             inputs={

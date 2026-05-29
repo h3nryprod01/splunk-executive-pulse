@@ -58,6 +58,7 @@ class ChurnRiskCalculator(BaseCalculator):
         )
 
         return CalculationStep(
+            calculator_name=self.name,
             label=self.label,
             formula=(
                 f"{ent_count} enterprise × {effective_churn*100:.1f}% churn risk "

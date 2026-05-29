@@ -46,6 +46,7 @@ class DirectRevenueCalculator(BaseCalculator):
         )
 
         return CalculationStep(
+            calculator_name=self.name,
             label=self.label,
             formula=f"${rpm:,.0f}/min × {duration_min:.1f} min × {failure_rate*100:.0f}% failure",
             inputs={

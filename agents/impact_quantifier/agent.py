@@ -101,25 +101,35 @@ class ImpactQuantifierAgent:
         )
 
     # ---------- private ----------
-    @staticmethod
-    def _aggregate(steps: list[CalculationStep]) -> FinancialImpact:
+    # Stable calculator-name → FinancialImpact field. Dispatching on the
+    # calculator's `name` (not its human-readable label) decouples financial
+    # correctness from UI wording.
+    _CALCULATOR_FIELD_MAP = {
+        "direct_revenue": "direct_revenue_loss_usd",
+        "churn_risk": "indirect_exposure_usd",
+        "sla_credits": "sla_credit_liability_usd",
+        "incident_response_cost": "incident_response_cost_usd",
+    }
+
+    @classmethod
+    def _aggregate(cls, steps: list[CalculationStep]) -> FinancialImpact:
         impact = FinancialImpact(calculations=steps, aggregated_confidence=1.0)
         if not steps:
             impact.aggregated_confidence = 0.0
             return impact
 
-        # Bucket by step.label
+        # Dispatch each step into its FinancialImpact field by stable
+        # calculator_name. Unknown calculator names are logged and ignored
+        # so they never silently inflate (or get dropped from) the total.
         for s in steps:
-            if "Direct revenue" in s.label:
-                impact.direct_revenue_loss_usd = s.result_usd
-            elif "churn" in s.label.lower():
-                impact.indirect_exposure_usd = s.result_usd
-            elif "SLA" in s.label:
-                impact.sla_credit_liability_usd = s.result_usd
-            elif "response" in s.label.lower():
-                impact.incident_response_cost_usd = s.result_usd
-            elif "overrun" in s.label.lower():
-                impact.cost_overrun_usd = s.result_usd
+            field = cls._CALCULATOR_FIELD_MAP.get(s.calculator_name)
+            if field is None:
+                logger.warning(
+                    f"No FinancialImpact field mapped for calculator "
+                    f"'{s.calculator_name}' (label={s.label!r}); skipping"
+                )
+                continue
+            setattr(impact, field, s.result_usd)
 
         impact.total_exposure_usd = round(
             impact.direct_revenue_loss_usd +
@@ -130,7 +140,9 @@ class ImpactQuantifierAgent:
             2,
         )
 
-        # Aggregated confidence: weighted geometric mean by contribution
+        # Aggregated confidence: weighted ARITHMETIC mean, each step weighted
+        # by its share of total dollar contribution. Uses the same `steps`
+        # set as total_exposure for a consistent denominator.
         total = sum(s.result_usd for s in steps) or 1.0
         weighted_conf = sum(s.confidence * (s.result_usd / total) for s in steps)
         impact.aggregated_confidence = round(weighted_conf, 2)

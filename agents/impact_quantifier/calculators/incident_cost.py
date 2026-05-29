@@ -34,6 +34,7 @@ class IncidentResponseCostCalculator(BaseCalculator):
         cost = engineers * hours * self.LOADED_RATE_PER_HOUR
 
         return CalculationStep(
+            calculator_name=self.name,
             label=self.label,
             formula=f"{engineers} engineers × {hours:.1f}h × ${self.LOADED_RATE_PER_HOUR}/h",
             inputs={

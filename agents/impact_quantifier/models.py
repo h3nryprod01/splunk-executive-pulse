@@ -13,6 +13,7 @@ class CalculationStep(BaseModel):
     A single, transparent calculation step.
     Used to render 'methodology' tooltips in the UI.
     """
+    calculator_name: str                  # stable id of producing calculator
     label: str                            # e.g., "Direct revenue loss"
     formula: str                          # human-readable formula
     inputs: dict[str, float]              # name → value

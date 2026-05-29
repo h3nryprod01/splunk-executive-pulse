@@ -20,7 +20,7 @@ from agents.executive_editor.models import EditorOutput
 from agents.impact_quantifier.models import QuantifiedSignal
 from .models import NarrativeScript, Citation, DrillDownLink, WriterValidationError
 from .llm_client import LLMClient
-from .citation_enforcer import validate_citations
+from .citation_enforcer import validate_citations, redact_uncited_claims
 from .ssml_converter import to_ssml, estimate_duration_sec
 from .prompts.system_prompt import SYSTEM_PROMPT
 from .prompts.few_shot_examples import GOLD_STANDARD_EXAMPLE
@@ -98,10 +98,21 @@ class NarrativeWriterAgent:
             script_text = revised["script_text"]
             passes += 1
 
-        if validate_citations(script_text, citations):
-            logger.warning("Publishing despite uncited claims — last-resort fallback")
+        # Hard anti-hallucination guarantee: if any numeric claim STILL lacks
+        # a citation after the retry loop, REDACT it rather than publish a
+        # fabricated number. No dollar/number ships without a citation.
+        remaining = validate_citations(script_text, citations)
+        if remaining:
+            logger.warning(
+                f"Redacting {len(remaining)} uncited numeric claim(s) before "
+                f"publishing — anti-hallucination last-resort guarantee"
+            )
+            script_text = redact_uncited_claims(script_text, citations)
+            assert not validate_citations(script_text, citations), (
+                "redaction failed to remove all uncited claims"
+            )
 
-        # 5. Wrap to SSML
+        # 5. Wrap to SSML — recomputed from the (possibly redacted) text
         ssml = to_ssml(script_text)
         word_count = len(script_text.split())
         duration = estimate_duration_sec(script_text)

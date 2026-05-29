@@ -100,6 +100,39 @@ def validate_citations(
     return uncited
 
 
+# Neutral qualitative phrase to substitute for each kind of uncited claim.
+_REDACTION_PHRASE = {
+    "dollar": "an undisclosed amount",
+    "count": "a number of",
+    "percent": "a small share",
+}
+
+
+def redact_uncited_claims(
+    script: str, citations: list[Citation],
+    tolerance: float = 0.05,
+) -> str:
+    """
+    Hard guarantee: remove every uncited numeric claim from `script` by
+    replacing its substring with a neutral qualitative phrase appropriate
+    to its `kind`, rather than ever publishing a fabricated number.
+
+    Replacements are applied from the rightmost span to the leftmost so
+    that earlier spans' offsets remain valid as we mutate the string.
+    """
+    uncited = validate_citations(script, citations, tolerance=tolerance)
+    if not uncited:
+        return script
+
+    redacted = script
+    for claim in sorted(uncited, key=lambda u: u.span[0], reverse=True):
+        start, end = claim.span
+        phrase = _REDACTION_PHRASE.get(claim.kind, "an undisclosed amount")
+        redacted = redacted[:start] + phrase + redacted[end:]
+
+    return redacted
+
+
 def _looks_like_date_or_time(text: str, span: tuple[int,int], script: str) -> bool:
     val = text.replace(",", "")
     try:
