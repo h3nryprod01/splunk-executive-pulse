@@ -48,3 +48,5 @@ class IncidentReport:
     timeline: tuple[TimelineEvent, ...]
     verdict: TriageVerdict
     searches_run: int
+    narrative: str = ""
+    narrative_source: str = "offline"  # hosted-models | offline

@@ -129,9 +129,16 @@ export default function SplCopilotPage() {
           </div>
 
           <div className="bg-card border border-border rounded-2xl p-5 space-y-2">
-            <h2 className="text-sm text-muted uppercase tracking-widest font-mono">
-              Explanation
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm text-muted uppercase tracking-widest font-mono">
+                Explanation
+              </h2>
+              {active.explanation_source && (
+                <span className="text-[10px] text-dim font-mono uppercase tracking-widest">
+                  source: {active.explanation_source}
+                </span>
+              )}
+            </div>
             <p className="text-dim text-sm whitespace-pre-wrap leading-relaxed">
               {active.explanation}
             </p>

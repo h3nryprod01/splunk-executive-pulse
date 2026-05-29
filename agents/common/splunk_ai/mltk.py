@@ -39,6 +39,24 @@ def anomaly_detection_spl(
     return base + " | anomalydetection error_count action=annotate"
 
 
+def count_anomaly_spl(
+    index: str, sourcetype: str, where: str = "",
+    by_field: str = "src_ip", span: str = "1m",
+) -> str:
+    """Flag anomalous event-count buckets for any filtered stream.
+
+    Generic counterpart to anomaly_detection_spl (which is error-rate specific).
+    Used e.g. for detecting a credential-stuffing burst on an auth source.
+    """
+    base = f"search index={index} sourcetype={sourcetype} {where}".strip()
+    return (
+        base
+        + f" | bin _time span={span}"
+        + f" | stats count AS event_count by _time, {by_field}"
+        + " | anomalydetection event_count action=annotate"
+    )
+
+
 def forecast_spl(
     index: str, sourcetype: str, metric: str = "p99(response_ms)",
     span: str = "1h", future_timespan: int = 24, holdback: int = 0,

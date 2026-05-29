@@ -39,6 +39,8 @@ export interface IncidentReport {
   timeline: TimelineEvent[];
   verdict: TriageVerdict;
   searches_run: number;
+  narrative: string;
+  narrative_source: string;
 }
 
 // Built-in fallback so the demo always renders without an exported report.
@@ -95,4 +97,7 @@ export const FALLBACK_INCIDENT: IncidentReport = {
       "A successful login followed a brute-force burst from the same source IP(s) (5.5.5.5, 5.5.5.6); account(s) alice are presumed compromised with post-compromise data export.",
   },
   searches_run: 4,
+  narrative:
+    "Alert 'Spike in blocked authentication attempts on auth-svc' was triaged as CRITICAL (Account takeover via credential stuffing, confidence 90%). A successful login followed a brute-force burst from the same source IP(s) (5.5.5.5, 5.5.5.6); account(s) alice are presumed compromised with post-compromise data export. Recommend immediate containment: Disable account(s): alice. Source IP(s) 5.5.5.5, 5.5.5.6 should be blocked at the edge.",
+  narrative_source: "offline",
 };

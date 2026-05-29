@@ -29,6 +29,20 @@ def test_timeline_is_ordered_and_includes_success():
     assert any(t.action == "export" for t in report.timeline)
 
 
+def test_step1_uses_mltk_anomalydetection():
+    report = SOCTriageCopilot().triage(ALERT)
+    step1 = next(f for f in report.findings if f.step == 1)
+    assert "anomalydetection" in step1.spl
+    assert "MLTK" in step1.summary
+
+
+def test_incident_has_offline_narrative_keyless():
+    report = SOCTriageCopilot().triage(ALERT)
+    assert report.narrative_source == "offline"
+    assert "CRITICAL" in report.narrative
+    assert "alice" in report.narrative
+
+
 def test_no_compromise_when_no_successful_login():
     # Searcher that never returns a successful login or data access.
     def only_blocked(spl: str):

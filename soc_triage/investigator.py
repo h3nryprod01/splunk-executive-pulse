@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+from .detection import detect_auth_anomaly
 from .models import Alert, Finding, TimelineEvent
 from .mock_splunk import search as mock_search
 
@@ -28,18 +29,24 @@ class Investigator:
         events: list[dict] = []
         facts: dict = {}
 
-        # Step 1 — quantify the burst and identify attacker IPs.
-        spl1 = f"search index={alert.index} sourcetype={alert.sourcetype} result=blocked"
-        blocked = self._run(spl1)
+        # Step 1 — MLTK anomaly detection: is the blocked-auth rate a real spike?
+        det = detect_auth_anomaly(self._run, alert.index, alert.sourcetype)
+        blocked = det["rows"]
         events += blocked
-        attacker_ips = sorted({e["src_ip"] for e in blocked})
+        attacker_ips = sorted({e["src_ip"] for e in blocked if "src_ip" in e})
         facts["attacker_ips"] = attacker_ips
+        facts["anomaly_score"] = det["score"]
+        if det["is_anomaly"]:
+            summary = (f"MLTK flagged a spike: {det['score']:.0f}x baseline; "
+                       f"{len(blocked)} blocked attempts from {len(attacker_ips)} IP(s) "
+                       f"({', '.join(attacker_ips)}).")
+        else:
+            summary = (f"{len(blocked)} blocked attempts; no anomalous spike "
+                       f"flagged by MLTK.")
         findings.append(Finding(
             step=1,
-            question="How many blocked auth attempts, and from which source IPs?",
-            spl=spl1, row_count=len(blocked),
-            summary=f"{len(blocked)} blocked attempts from {len(attacker_ips)} IP(s): "
-                    f"{', '.join(attacker_ips)}.",
+            question="MLTK anomalydetection: is the blocked-auth rate anomalous?",
+            spl=det["spl"], row_count=len(blocked), summary=summary,
         ))
 
         # Step 2 — PIVOT: did any login SUCCEED from an attacker IP?

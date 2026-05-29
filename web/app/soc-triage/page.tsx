@@ -32,7 +32,8 @@ export default function SocTriagePage() {
     };
   }, []);
 
-  const { alert, findings, timeline, verdict, searches_run } = report;
+  const { alert, findings, timeline, verdict, searches_run, narrative, narrative_source } =
+    report;
 
   return (
     <main className="max-w-6xl mx-auto p-6 md:p-12 space-y-6">
@@ -68,6 +69,20 @@ export default function SocTriagePage() {
         <p className="text-sm opacity-90">{alert.title}</p>
         <p className="text-sm opacity-80 leading-relaxed">{verdict.rationale}</p>
       </section>
+
+      {narrative && (
+        <section className="bg-card border border-border rounded-2xl p-5 space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm text-muted uppercase tracking-widest font-mono">
+              Incident narrative
+            </h2>
+            <span className="text-[10px] text-dim font-mono uppercase tracking-widest">
+              source: {narrative_source}
+            </span>
+          </div>
+          <p className="text-dim text-sm leading-relaxed">{narrative}</p>
+        </section>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Investigation steps */}

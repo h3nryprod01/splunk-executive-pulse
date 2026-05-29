@@ -9,10 +9,10 @@
   "findings": [
     {
       "step": 1,
-      "question": "How many blocked auth attempts, and from which source IPs?",
-      "spl": "search index=security sourcetype=auth-svc result=blocked",
+      "question": "MLTK anomalydetection: is the blocked-auth rate anomalous?",
+      "spl": "search index=security sourcetype=auth-svc result=blocked | bin _time span=1m | stats count AS event_count by _time, src_ip | anomalydetection event_count action=annotate",
       "row_count": 5,
-      "summary": "5 blocked attempts from 2 IP(s): 5.5.5.5, 5.5.5.6."
+      "summary": "MLTK flagged a spike: 4x baseline; 5 blocked attempts from 2 IP(s) (5.5.5.5, 5.5.5.6)."
     },
     {
       "step": 2,
@@ -85,5 +85,7 @@
     ],
     "rationale": "A successful login followed a brute-force burst from the same source IP(s) (5.5.5.5, 5.5.5.6); account(s) alice are presumed compromised with post-compromise data export."
   },
-  "searches_run": 4
+  "searches_run": 4,
+  "narrative": "Alert 'Spike in blocked authentication attempts on auth-svc' was triaged as CRITICAL (Account takeover via credential stuffing, confidence 90%). A successful login followed a brute-force burst from the same source IP(s) (5.5.5.5, 5.5.5.6); account(s) alice are presumed compromised with post-compromise data export. Recommend immediate containment: Disable account(s): alice. Source IP(s) 5.5.5.5, 5.5.5.6 should be blocked at the edge.",
+  "narrative_source": "offline"
 }

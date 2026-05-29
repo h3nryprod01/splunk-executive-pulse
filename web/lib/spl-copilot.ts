@@ -16,6 +16,7 @@ export interface CopilotScenario {
   explanation: string;
   spl_source: string;
   row_count: number;
+  explanation_source?: string;
 }
 
 export interface ScenariosPayload {

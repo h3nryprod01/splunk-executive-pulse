@@ -15,8 +15,11 @@ Executive Pulse submission; shares only the low-level Splunk clients.
    an offline phrasebook so demos run keyless).
 2. **Run** — `MockExecutor` (keyless) or `MCPExecutor` (live Splunk MCP server).
 3. **Self-critique** — on an unknown field, remap against the index schema
-   (alias table + fuzzy match) and re-run, up to `max_fixes` times.
-4. **Explain** — pipe-by-pipe, plain-English breakdown of the final query.
+   (alias table + fuzzy match); if that fails and credentials are present, fall
+   back to **Splunk Hosted Models** for the remap. Re-run, up to `max_fixes` times.
+4. **Explain** — pipe-by-pipe breakdown via **Splunk Hosted Models** when
+   configured, with a deterministic offline template as the keyless fallback
+   (`explanation_source` records which was used).
 
 ## Run it (zero infra, zero keys)
 

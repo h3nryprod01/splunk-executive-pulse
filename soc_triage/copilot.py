@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from .investigator import Investigator, Searcher
 from .models import Alert, IncidentReport
+from .narrate import narrate
 from .triage import assess
 
 
@@ -18,10 +19,13 @@ class SOCTriageCopilot:
         investigator = Investigator(searcher=self._searcher)
         findings, timeline, facts = investigator.investigate(alert)
         verdict = assess(facts, tuple(findings))
+        narrative, narrative_source = narrate(alert.title, tuple(findings), verdict, facts)
         return IncidentReport(
             alert=alert,
             findings=tuple(findings),
             timeline=tuple(timeline),
             verdict=verdict,
             searches_run=investigator.searches_run,
+            narrative=narrative,
+            narrative_source=narrative_source,
         )

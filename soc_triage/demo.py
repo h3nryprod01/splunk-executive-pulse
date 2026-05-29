@@ -32,6 +32,9 @@ def main() -> None:
     for t in report.timeline:
         print(f"  {t.time}  {t.actor:<12} {t.action:<14} {t.detail}")
 
+    print(f"\nNarrative ({report.narrative_source}):")
+    print(f"  {report.narrative}")
+
     v = report.verdict
     print(f"\nVERDICT: {v.severity} — {v.classification} (confidence {v.confidence:.2f})")
     print(f"  {v.rationale}")

@@ -37,3 +37,6 @@ web/public/audio/
 
 # Local agent/editor config
 .claude/
+
+# Internal audit report (kept local, not for the public repo)
+audit/Audit_Report_VI.docx

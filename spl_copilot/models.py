@@ -38,3 +38,4 @@ class CopilotResult:
     explanation: str
     spl_source: str
     row_count: int
+    explanation_source: str = "offline"  # hosted-models | offline

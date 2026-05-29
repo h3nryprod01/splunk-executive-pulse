@@ -38,7 +38,8 @@
       ],
       "explanation": "1. Filter events matching: index=prod sourcetype=payment-svc http_status>=500\n2. Bucket the matching events over time (timechart span=1m count).",
       "spl_source": "offline-fallback",
-      "row_count": 3
+      "row_count": 3,
+      "explanation_source": "offline"
     },
     {
       "intent": "blocked logins by source ip",
@@ -107,7 +108,8 @@
       "steps": [],
       "explanation": "1. Filter events matching: index=* blocked logins source\n2. Return only the first 100 rows.",
       "spl_source": "offline-fallback",
-      "row_count": 7
+      "row_count": 7,
+      "explanation_source": "offline"
     },
     {
       "intent": "checkout latency",
@@ -116,7 +118,8 @@
       "steps": [],
       "explanation": "1. Filter events matching: index=prod sourcetype=checkout-svc\n2. Bucket the matching events over time (timechart span=1h p99(response_ms)).",
       "spl_source": "offline-fallback",
-      "row_count": 0
+      "row_count": 0,
+      "explanation_source": "offline"
     },
     {
       "intent": "purple monkey dishwasher zorp",
@@ -185,7 +188,8 @@
       "steps": [],
       "explanation": "1. Filter events matching: index=* purple monkey dishwasher zorp\n2. Return only the first 100 rows.",
       "spl_source": "offline-fallback",
-      "row_count": 7
+      "row_count": 7,
+      "explanation_source": "offline"
     }
   ]
 }

@@ -13,8 +13,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from agents.common.splunk_ai.spl_assistant import SplunkSPLAssistant  # noqa: E402
 
-from .critique import fix_unknown_fields
-from .explain import explain_spl
+from .critique import fix_unknown_fields, llm_fix_unknown_fields
+from .explain import explain_spl_llm
 from .mock_index import MockExecutor
 from .models import CopilotResult, CritiqueStep
 
@@ -34,9 +34,11 @@ class SPLCopilot:
         for _ in range(self.max_fixes):
             if result.ok or not result.unknown_fields:
                 break
-            fix = fix_unknown_fields(
-                spl, result.unknown_fields, self.executor.fields_for(spl),
-            )
+            available = self.executor.fields_for(spl)
+            # Deterministic remap first; Hosted Models as a fallback.
+            fix = fix_unknown_fields(spl, result.unknown_fields, available)
+            if fix is None:
+                fix = await llm_fix_unknown_fields(spl, result.unknown_fields, available)
             if fix is None:
                 break
             new_spl, reason = fix
@@ -44,12 +46,14 @@ class SPLCopilot:
             spl = new_spl
             result = self.executor.run(spl)
 
+        explanation, explanation_source = await explain_spl_llm(spl)
         return CopilotResult(
             intent=nl_intent,
             final_spl=spl,
             rows=result.rows,
             steps=tuple(steps),
-            explanation=explain_spl(spl),
+            explanation=explanation,
             spl_source=suggestion.source,
             row_count=len(result.rows),
+            explanation_source=explanation_source,
         )

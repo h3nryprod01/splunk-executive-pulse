@@ -12,10 +12,13 @@ low-level Splunk clients.
 
 ## The agentic loop (pivoting investigation)
 
-1. **Quantify** the alert: blocked attempts + source IPs.
+1. **Detect** with **MLTK** `| anomalydetection`: is the blocked-auth rate a
+   real spike, and from which source IPs? (replaces assuming the alert is valid).
 2. **Pivot** on the discovered IPs: did any login *succeed* from them? → takeover.
 3. **Pivot** on the compromised account: post-login data access?
 4. **Verdict**: deterministic severity + classification + containment actions.
+5. **Narrate**: an analyst-facing incident summary via **Splunk Hosted Models**
+   when configured (offline template otherwise); the verdict stays deterministic.
 
 Each step's output feeds the next query — that is the agentic behaviour, not a
 fixed report.
@@ -46,8 +49,10 @@ report = SOCTriageCopilot(searcher=my_mcp_search).triage(alert)
 
 | File | Role |
 |---|---|
-| `copilot.py` | alert -> investigation -> verdict |
+| `copilot.py` | alert -> investigation -> verdict -> narrative |
 | `investigator.py` | multi-step pivoting search loop + timeline |
+| `detection.py` | MLTK anomalydetection (shared `agents.common.splunk_ai.mltk`) |
 | `triage.py` | deterministic severity/verdict/containment |
+| `narrate.py` | Hosted Models incident narrative + offline fallback |
 | `mock_splunk.py` | keyless security events + SPL search executor |
 | `models.py` | typed contracts |
