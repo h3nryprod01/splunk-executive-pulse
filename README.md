@@ -6,6 +6,8 @@ language executives actually speak.
 
 Built for the **Splunk Agentic Ops Hackathon 2026**.
 
+**🎬 Demo video (3 min):** [youtube.com/watch?v=7FRnoH_BwD0](https://www.youtube.com/watch?v=7FRnoH_BwD0)
+
 ## The problem
 
 Enterprises spend billions on observability, yet the executives making business
