@@ -45,3 +45,7 @@ web/tsconfig.tsbuildinfo
 
 # Local status reports (not repo material)
 HACKATHON_STATUS.html
+
+# Demo video (upload to YouTube, not the repo)
+pulse-demo-*.mp4
+pulse-demo-*.mov
