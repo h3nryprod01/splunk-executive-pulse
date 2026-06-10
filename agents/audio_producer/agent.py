@@ -143,8 +143,8 @@ class AudioProducerAgent:
         Normalize to -16 LUFS (podcast standard).
         Requires ffmpeg installed.
         """
+        import subprocess
         try:
-            import subprocess
             dst = src.with_name(src.stem + "-norm.mp3")
             subprocess.run([
                 "ffmpeg", "-y", "-i", str(src),
@@ -154,14 +154,15 @@ class AudioProducerAgent:
             ], check=True, capture_output=True)
             src.unlink()
             return dst
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError) as e:
+            # ffmpeg missing (FileNotFoundError) or non-zero exit — degrade gracefully
             logger.warning(f"Loudness normalization failed ({e}); keeping original")
             return src
 
     def _generate_waveform(self, audio_path: Path) -> Optional[Path]:
         """Generate a PNG waveform preview for email/dashboard."""
+        import subprocess
         try:
-            import subprocess
             png_path = audio_path.with_suffix(".png")
             subprocess.run([
                 "ffmpeg", "-y", "-i", str(audio_path),
@@ -171,7 +172,7 @@ class AudioProducerAgent:
                 "-frames:v", "1", str(png_path),
             ], check=True, capture_output=True)
             return png_path
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError) as e:
             logger.warning(f"Waveform generation failed: {e}")
             return None
 

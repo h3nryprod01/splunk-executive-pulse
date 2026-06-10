@@ -8,6 +8,7 @@ Flow:
 Conditional routing: if any node sets status=failed, jump to terminal_error.
 """
 from __future__ import annotations
+import logging
 import os
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
@@ -18,6 +19,8 @@ from .nodes import (
     node_executive_editor, node_narrative_writer, node_audio_producer,
     node_delivery,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def should_continue(state: PipelineState) -> str:
@@ -32,8 +35,13 @@ async def terminal_error_node(state: PipelineState) -> dict:
     from delivery.slack import deliver_failure_alert
     try:
         await deliver_failure_alert(state)
-    except Exception:
-        pass
+    except Exception as e:
+        # Never crash the error path itself, but never lose the trace either.
+        logger.error(
+            "terminal_error_node: failure alert could not be delivered "
+            "(run_id=%s): %s: %s",
+            state.get("run_id", "?"), type(e).__name__, e,
+        )
     return {"status": "failed", "current_stage": "terminal_error"}
 
 

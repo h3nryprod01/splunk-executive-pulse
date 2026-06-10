@@ -16,7 +16,10 @@ export default function AudioPlayer({ src, durationSec }: Props) {
     const a = audioRef.current!;
     const onTime = () => {
       setCurrent(a.currentTime);
-      setProgress((a.currentTime / (a.duration || durationSec)) * 100);
+      // a.duration can be NaN (metadata not loaded) or Infinity (stream).
+      const dur =
+        Number.isFinite(a.duration) && a.duration > 0 ? a.duration : durationSec;
+      setProgress(dur > 0 ? (a.currentTime / dur) * 100 : 0);
     };
     const onEnd = () => setPlaying(false);
     a.addEventListener("timeupdate", onTime);

@@ -15,6 +15,7 @@ from typing import Optional
 
 from agents.executive_editor.models import Persona
 from .graph import build_graph
+from .nodes import validate_environment
 from .state import PipelineState
 from .observability import structured_log
 
@@ -27,6 +28,9 @@ async def run_briefing(
     time_window_hours: int = 24,
     thread_id: Optional[str] = None,
 ) -> PipelineState:
+    # Fail fast on missing required config instead of crashing mid-pipeline.
+    validate_environment()
+
     briefing_date = briefing_date or datetime.now(tz=timezone.utc)
     run_id = f"run_{uuid.uuid4().hex[:10]}"
     thread_id = thread_id or f"{persona.value}-{briefing_date.date().isoformat()}"

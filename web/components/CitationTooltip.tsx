@@ -21,6 +21,11 @@ export default function CitationTooltip({
         onClick={() => setOpen(!open)}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
+        aria-expanded={open}
+        aria-label="Show calculation methodology"
         className="text-gold underline decoration-dotted underline-offset-4 cursor-help"
       >
         {children}

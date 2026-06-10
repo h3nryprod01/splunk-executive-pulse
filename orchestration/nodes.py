@@ -82,6 +82,55 @@ class Dependencies:
 DEPS = Dependencies()
 
 
+class MissingConfigError(RuntimeError):
+    """Raised at startup when required environment variables are absent."""
+
+
+def validate_environment(deps: Dependencies | None = None) -> list[str]:
+    """Fail-fast startup check for the live pipeline.
+
+    Hard-fails (raises MissingConfigError) on env vars whose absence would
+    otherwise crash a node mid-run via ``os.environ[...]`` (Splunk MCP,
+    Postgres). Dependencies that were already injected (demo/test stubs)
+    are skipped. Credentials with graceful fallbacks (LLM, ElevenLabs)
+    only emit warnings; the returned list contains those warnings.
+    """
+    import os
+    deps = deps or DEPS
+
+    missing: list[str] = []
+    if deps._splunk_mcp is None or deps._mcp_client is None:
+        missing += [v for v in ("SPLUNK_MCP_URL", "SPLUNK_MCP_TOKEN")
+                    if not os.environ.get(v)]
+    if deps._business_store is None and not os.environ.get("PG_DSN"):
+        missing.append("PG_DSN")
+    if missing:
+        raise MissingConfigError(
+            "Missing required environment variables: "
+            + ", ".join(sorted(set(missing)))
+            + ". Set them in .env (see .env.example) or inject demo stubs "
+              "before running the pipeline."
+        )
+
+    warnings: list[str] = []
+    if deps._llm is None and not (
+        os.environ.get("SPLUNK_LLM_ENDPOINT")
+        or os.environ.get("ANTHROPIC_API_KEY")
+        or os.environ.get("OPENAI_API_KEY")
+    ):
+        warnings.append(
+            "No LLM credentials (SPLUNK_LLM_ENDPOINT / ANTHROPIC_API_KEY / "
+            "OPENAI_API_KEY) — narrative_writer will fail unless stubbed."
+        )
+    if not os.environ.get("ELEVENLABS_API_KEY"):
+        warnings.append(
+            "ELEVENLABS_API_KEY not set — audio_producer will fail unless stubbed."
+        )
+    for w in warnings:
+        logger.warning("validate_environment: %s", w)
+    return warnings
+
+
 def _record_error(state: PipelineState, node: str, exc: Exception, attempt: int) -> NodeError:
     return NodeError(
         node=node, error_type=type(exc).__name__,
